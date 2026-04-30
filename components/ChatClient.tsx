@@ -9,6 +9,14 @@ import { personas } from "@/lib/personas";
 import { ChatMessage, PersonaId } from "@/lib/types";
 import { uid } from "@/lib/utils";
 
+function getFriendlyError(status: number, apiMessage?: string) {
+  if (apiMessage) return apiMessage;
+  if (status === 401) return "Gemini key is invalid. Please update environment variables.";
+  if (status === 429) return "Quota exceeded. Please wait and try again.";
+  if (status >= 500) return "AI service is temporarily unavailable. Please try again.";
+  return "Could not complete the request. Please try again.";
+}
+
 export function ChatClient() {
   const [activePersona, setActivePersona] = useState<PersonaId>("anshuman");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -40,23 +48,41 @@ export function ChatClient() {
         }),
       });
 
-      if (!response.ok || !response.body) {
+      if (!response.ok) {
+        let apiMessage = "";
+        try {
+          const data = (await response.json()) as { error?: string };
+          apiMessage = data.error ?? "";
+        } catch {
+          apiMessage = "";
+        }
+        throw new Error(getFriendlyError(response.status, apiMessage));
+      }
+
+      if (!response.body) {
         throw new Error("Could not stream response from server.");
       }
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
+      let receivedAnyText = false;
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
+        if (chunk) receivedAnyText = true;
         setMessages((prev) =>
           prev.map((msg) => (msg.id === assistantId ? { ...msg, content: msg.content + chunk } : msg))
         );
       }
-    } catch {
-      setError("The AI service is currently unavailable. Please check your API key and try again.");
+
+      if (!receivedAnyText) {
+        throw new Error("Model returned an empty response. Please try again.");
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "";
+      setError(message || "The AI service is currently unavailable. Please try again.");
       setMessages((prev) => prev.filter((msg) => msg.id !== assistantId));
     } finally {
       setLoading(false);

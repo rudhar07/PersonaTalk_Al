@@ -76,6 +76,26 @@ persona-chat/
 2. Import repo in Vercel.
 3. Add env var `GEMINI_API_KEY` (and optional `GEMINI_MODEL`).
 4. Deploy and copy your public live URL.
+5. Test persona switch + streaming in production.
+
+## Environment Variables
+
+Use real secrets only in local or hosting environment settings:
+
+```env
+GEMINI_API_KEY=your_real_key
+GEMINI_MODEL=gemini-2.5-flash
+```
+
+- Keep real secrets in `.env.local` (never commit).
+- Commit only `.env.example` with placeholder values.
+
+## Production Troubleshooting
+
+- `Server is missing GEMINI_API_KEY` -> add env variable in Vercel and redeploy.
+- `Gemini API key is invalid or not authorized` -> rotate key, update Vercel env, redeploy.
+- `Gemini quota exceeded` -> wait/reset quota or use another valid key.
+- No AI response in deployed app -> confirm env vars are set for Production and inspect Vercel Function logs.
 
 ## Notes
 
