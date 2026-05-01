@@ -102,40 +102,52 @@ export function ChatClient() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-4 px-4 py-6 text-white sm:px-6 lg:px-8">
-      <header className="rounded-3xl border border-white/15 bg-black/35 p-4 backdrop-blur-xl sm:p-6">
-        <p className="text-xs uppercase tracking-[0.2em] text-white/65">Persona Studio</p>
-        <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    <main className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-5 overflow-hidden px-4 py-8 text-white sm:px-6 lg:px-8">
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute -top-20 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-white/10 blur-3xl" />
+        <div className={`absolute -right-16 top-24 h-64 w-64 rounded-full bg-gradient-to-br ${persona.accent} opacity-20 blur-3xl`} />
+      </div>
+
+      <header className="rounded-3xl border border-white/15 bg-gradient-to-b from-white/15 to-white/5 p-5 shadow-[0_14px_50px_-20px_rgba(0,0,0,0.8)] ring-1 ring-white/10 backdrop-blur-2xl sm:p-7">
+        <p className="text-xs uppercase tracking-[0.24em] text-white/60">Persona Studio</p>
+        <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold sm:text-3xl">{persona.name}</h1>
-            <p className="text-sm text-white/75">{persona.title}</p>
+            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{persona.name}</h1>
+            <p className="mt-1 text-sm text-white/75 sm:text-base">{persona.title}</p>
           </div>
-          <div className={`h-12 w-12 rounded-2xl bg-gradient-to-br ${persona.accent} p-[1px]`}>
-            <div className="flex h-full w-full items-center justify-center rounded-2xl bg-black/50 text-lg font-bold">
+          <div
+            className={`h-14 w-14 rounded-2xl bg-gradient-to-br ${persona.accent} p-[1px] shadow-[0_8px_32px_-12px_rgba(255,255,255,0.6)]`}
+          >
+            <div className="flex h-full w-full items-center justify-center rounded-2xl bg-black/55 text-lg font-bold">
               {persona.initials}
             </div>
           </div>
         </div>
-        <p className="mt-3 text-sm text-white/80">{persona.quote}</p>
-        <PersonaSwitcher activePersona={activePersona} onChange={switchPersona} />
+        <p className="mt-4 text-sm leading-relaxed text-white/80 sm:text-base">{persona.quote}</p>
+        <div className="mt-5">
+          <PersonaSwitcher activePersona={activePersona} onChange={switchPersona} />
+        </div>
       </header>
 
-      <section className="grid gap-4 lg:grid-cols-[280px,1fr]">
-        <aside className="rounded-3xl border border-white/15 bg-black/30 p-4 backdrop-blur-xl">
-          <h2 className="text-sm font-semibold">Known For</h2>
-          <ul className="mt-2 space-y-2 text-sm text-white/80">
+      <section className="grid gap-5 lg:grid-cols-[300px,1fr]">
+        <aside className="rounded-3xl border border-white/15 bg-gradient-to-b from-white/10 to-white/5 p-5 shadow-[0_14px_50px_-20px_rgba(0,0,0,0.8)] ring-1 ring-white/10 backdrop-blur-2xl">
+          <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-white/85">Known For</h2>
+          <ul className="mt-3 space-y-2.5 text-sm leading-relaxed text-white/80">
             {persona.knownFor.map((item) => (
-              <li key={item}>- {item}</li>
+              <li key={item} className="flex items-start gap-2">
+                <span className="mt-[7px] h-1.5 w-1.5 rounded-full bg-white/55" />
+                <span>{item}</span>
+              </li>
             ))}
           </ul>
-          <p className="mt-4 text-sm text-white/70">{persona.bio}</p>
+          <p className="mt-5 text-sm leading-relaxed text-white/70">{persona.bio}</p>
           <SuggestionChips items={persona.suggestions} onPick={(v) => setInput(v)} />
         </aside>
 
-        <div className="flex min-h-[65vh] flex-col rounded-3xl border border-white/15 bg-black/30 p-4 backdrop-blur-xl">
-          <div className="flex-1 space-y-3 overflow-y-auto pr-1">
+        <div className="flex min-h-[68vh] flex-col rounded-3xl border border-white/15 bg-gradient-to-b from-white/10 to-white/5 p-5 shadow-[0_14px_50px_-20px_rgba(0,0,0,0.8)] ring-1 ring-white/10 backdrop-blur-2xl">
+          <div className="flex-1 space-y-3.5 overflow-y-auto pr-1">
             {messages.length === 0 ? (
-              <p className="rounded-2xl border border-dashed border-white/20 bg-white/5 p-4 text-sm text-white/70">
+              <p className="rounded-2xl border border-dashed border-white/20 bg-white/5 p-5 text-sm leading-relaxed text-white/70">
                 Start with a suggestion chip or ask your own question. Switching personas resets this thread by design.
               </p>
             ) : (
@@ -150,18 +162,18 @@ export function ChatClient() {
             </p>
           )}
 
-          <form onSubmit={onSubmit} className="mt-4 flex gap-2">
+          <form onSubmit={onSubmit} className="mt-5 flex gap-2">
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               rows={2}
               placeholder={`Ask ${persona.name.split(" ")[0]} anything...`}
-              className="flex-1 resize-none rounded-2xl border border-white/15 bg-black/35 px-3 py-2 text-sm outline-none focus:border-white/40"
+              className="flex-1 resize-none rounded-2xl border border-white/20 bg-black/35 px-4 py-3 text-sm leading-relaxed outline-none ring-1 ring-white/5 transition placeholder:text-white/45 focus:border-white/45 focus:ring-white/20"
             />
             <button
               type="submit"
               disabled={loading}
-              className="rounded-2xl border border-white/25 bg-white/15 px-4 py-2 text-sm font-semibold transition hover:bg-white/25 disabled:cursor-not-allowed disabled:opacity-60"
+              className={`rounded-2xl border border-white/25 bg-gradient-to-br ${persona.accent} px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_28px_-16px_rgba(255,255,255,0.9)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60`}
             >
               Send
             </button>
