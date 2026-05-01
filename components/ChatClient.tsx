@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, KeyboardEvent, useMemo, useState } from "react";
 import { MessageBubble } from "@/components/MessageBubble";
 import { PersonaSwitcher } from "@/components/PersonaSwitcher";
 import { SuggestionChips } from "@/components/SuggestionChips";
@@ -94,6 +94,12 @@ export function ChatClient() {
     void sendMessage(input);
   }
 
+  function onInputKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key !== "Enter" || e.shiftKey || e.nativeEvent.isComposing) return;
+    e.preventDefault();
+    void sendMessage(input);
+  }
+
   function switchPersona(personaId: PersonaId) {
     setActivePersona(personaId);
     setMessages([]);
@@ -145,7 +151,7 @@ export function ChatClient() {
         </aside>
 
         <div className="flex min-h-[68vh] flex-col rounded-3xl border border-white/15 bg-gradient-to-b from-white/10 to-white/5 p-5 shadow-[0_14px_50px_-20px_rgba(0,0,0,0.8)] ring-1 ring-white/10 backdrop-blur-2xl">
-          <div className="flex-1 space-y-3.5 overflow-y-auto pr-1">
+          <div className="flex-1 space-y-3.5 overflow-y-auto pr-1 [scrollbar-color:rgba(255,255,255,0.35)_transparent] [scrollbar-width:thin]">
             {messages.length === 0 ? (
               <p className="rounded-2xl border border-dashed border-white/20 bg-white/5 p-5 text-sm leading-relaxed text-white/70">
                 Start with a suggestion chip or ask your own question. Switching personas resets this thread by design.
@@ -157,26 +163,34 @@ export function ChatClient() {
           </div>
 
           {error && (
-            <p className="mt-3 rounded-xl border border-red-300/30 bg-red-500/15 px-3 py-2 text-sm text-red-100">
+            <p className="mt-4 rounded-2xl border border-red-200/35 bg-gradient-to-r from-red-500/20 to-red-400/10 px-4 py-3 text-sm text-red-100 shadow-[0_10px_24px_-16px_rgba(239,68,68,0.8)]">
               {error}
             </p>
           )}
 
-          <form onSubmit={onSubmit} className="mt-5 flex gap-2">
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              rows={2}
-              placeholder={`Ask ${persona.name.split(" ")[0]} anything...`}
-              className="flex-1 resize-none rounded-2xl border border-white/20 bg-black/35 px-4 py-3 text-sm leading-relaxed outline-none ring-1 ring-white/5 transition placeholder:text-white/45 focus:border-white/45 focus:ring-white/20"
-            />
-            <button
-              type="submit"
-              disabled={loading}
-              className={`rounded-2xl border border-white/25 bg-gradient-to-br ${persona.accent} px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_28px_-16px_rgba(255,255,255,0.9)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60`}
-            >
-              Send
-            </button>
+          <form
+            onSubmit={onSubmit}
+            className="mt-5 rounded-2xl border border-white/20 bg-black/35 p-2 shadow-[0_18px_34px_-24px_rgba(0,0,0,0.95)] ring-1 ring-white/10 backdrop-blur-xl"
+          >
+            <div className="flex gap-2">
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={onInputKeyDown}
+                rows={2}
+                placeholder={`Ask ${persona.name.split(" ")[0]} anything...`}
+                className="flex-1 resize-none rounded-xl border border-transparent bg-transparent px-3 py-2.5 text-sm leading-relaxed outline-none transition placeholder:text-white/45 focus:border-white/35 focus:bg-white/[0.02]"
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                className={`inline-flex min-w-24 items-center justify-center gap-1 rounded-xl border border-white/25 bg-gradient-to-br ${persona.accent} px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_28px_-16px_rgba(255,255,255,0.9)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60`}
+              >
+                <span>Send</span>
+                <span className="text-base leading-none">→</span>
+              </button>
+            </div>
+            <p className="px-3 pb-1 pt-2 text-[11px] text-white/45">Shift + Enter for new line</p>
           </form>
         </div>
       </section>
