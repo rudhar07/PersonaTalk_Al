@@ -12,19 +12,19 @@
 
 ## Screenshots
 
-**Landing — Anshuman Singh, hero + pull quote + numbered "known for" + suggestion chips**
+<p align="center">
+  <img src="./screenshots/desktop.png" alt="PersonaTalk AI — desktop" width="700" />
+  <br />
+  <em>Desktop — hero, persona switcher, suggestion chips, and chat</em>
+</p>
 
-![Landing — Anshuman Singh](./public/screenshots/landing.png)
+<p align="center">
+  <img src="./screenshots/mobile.png" alt="PersonaTalk AI — mobile" width="380" />
+  <br />
+  <em>Mobile — condensed layout with persona pills and pinned composer</em>
+</p>
 
-**Active conversation — real Gemini streaming response in-character**
-
-![Active conversation with Anshuman](./public/screenshots/conversation.png)
-
-**Mobile (iPhone 14 Pro Max) — sidebar hides, pill-row persona switcher, stacked knownFor, composer pinned**
-
-![Mobile view — Abhimanyu Saxena](./public/screenshots/mobile.png)
-
-Images live under [`public/screenshots/`](./public/screenshots/). Commit and push them so GitHub’s README preview can load them.
+Files live under [`screenshots/`](./screenshots/).
 
 ---
 
@@ -114,7 +114,7 @@ Only [`.env.example`](./.env.example) belongs in git (placeholders). Never commi
 │   ├── page.tsx
 │   └── globals.css
 ├── components/               # Chat, switcher, chips, typing indicator
-├── public/screenshots/       # README images
+├── screenshots/               # README images
 ├── lib/
 │   ├── personas.ts           # Persona metadata + system prompts
 │   ├── types.ts
