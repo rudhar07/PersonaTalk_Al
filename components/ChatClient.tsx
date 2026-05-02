@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, KeyboardEvent, useMemo, useState } from "react";
+import { FormEvent, KeyboardEvent, useEffect, useMemo, useRef, useState } from "react";
 import { MessageBubble } from "@/components/MessageBubble";
 import { PersonaSwitcher } from "@/components/PersonaSwitcher";
 import { SuggestionChips } from "@/components/SuggestionChips";
@@ -23,8 +23,23 @@ export function ChatClient() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isSwitchingPersona, setIsSwitchingPersona] = useState(false);
+  const messageViewportRef = useRef<HTMLDivElement | null>(null);
+  const personaSwitchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const persona = useMemo(() => personas[activePersona], [activePersona]);
+
+  useEffect(() => {
+    const viewport = messageViewportRef.current;
+    if (!viewport) return;
+    viewport.scrollTo({ top: viewport.scrollHeight, behavior: "smooth" });
+  }, [messages, loading]);
+
+  useEffect(() => {
+    return () => {
+      if (personaSwitchTimerRef.current) clearTimeout(personaSwitchTimerRef.current);
+    };
+  }, []);
 
   async function sendMessage(raw: string) {
     const content = raw.trim();
@@ -101,10 +116,13 @@ export function ChatClient() {
   }
 
   function switchPersona(personaId: PersonaId) {
+    if (personaSwitchTimerRef.current) clearTimeout(personaSwitchTimerRef.current);
+    setIsSwitchingPersona(true);
     setActivePersona(personaId);
     setMessages([]);
     setInput("");
     setError("");
+    personaSwitchTimerRef.current = setTimeout(() => setIsSwitchingPersona(false), 220);
   }
 
   return (
@@ -151,7 +169,12 @@ export function ChatClient() {
         </aside>
 
         <div className="flex min-h-[68vh] flex-col rounded-3xl border border-white/15 bg-gradient-to-b from-white/10 to-white/5 p-5 shadow-[0_14px_50px_-20px_rgba(0,0,0,0.8)] ring-1 ring-white/10 backdrop-blur-2xl">
-          <div className="flex-1 space-y-3.5 overflow-y-auto pr-1 [scrollbar-color:rgba(255,255,255,0.35)_transparent] [scrollbar-width:thin]">
+          <div
+            ref={messageViewportRef}
+            className={`flex-1 space-y-3.5 overflow-y-auto pr-1 transition-opacity duration-200 [scrollbar-color:rgba(255,255,255,0.35)_transparent] [scrollbar-width:thin] ${
+              isSwitchingPersona ? "opacity-40" : "opacity-100"
+            }`}
+          >
             {messages.length === 0 ? (
               <p className="rounded-2xl border border-dashed border-white/20 bg-white/5 p-5 text-sm leading-relaxed text-white/70">
                 Start with a suggestion chip or ask your own question. Switching personas resets this thread by design.
@@ -179,12 +202,12 @@ export function ChatClient() {
                 onKeyDown={onInputKeyDown}
                 rows={2}
                 placeholder={`Ask ${persona.name.split(" ")[0]} anything...`}
-                className="flex-1 resize-none rounded-xl border border-transparent bg-transparent px-3 py-2.5 text-sm leading-relaxed outline-none transition placeholder:text-white/45 focus:border-white/35 focus:bg-white/[0.02]"
+                className="flex-1 resize-none rounded-xl border border-transparent bg-transparent px-3 py-2.5 text-sm leading-relaxed outline-none transition-all duration-200 placeholder:text-white/45 focus:border-white/35 focus:bg-white/[0.02]"
               />
               <button
                 type="submit"
                 disabled={loading}
-                className={`inline-flex min-w-24 items-center justify-center gap-1 rounded-xl border border-white/25 bg-gradient-to-br ${persona.accent} px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_28px_-16px_rgba(255,255,255,0.9)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60`}
+                className={`inline-flex min-w-24 items-center justify-center gap-1 rounded-xl border border-white/25 bg-gradient-to-br ${persona.accent} px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_28px_-16px_rgba(255,255,255,0.9)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60`}
               >
                 <span>Send</span>
                 <span className="text-base leading-none">→</span>

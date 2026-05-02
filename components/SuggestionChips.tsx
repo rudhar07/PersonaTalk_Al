@@ -13,7 +13,7 @@ export function SuggestionChips({ items, onPick }: SuggestionChipsProps) {
           key={item}
           type="button"
           onClick={() => onPick(item)}
-          className="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs text-white/85 transition hover:border-white/40 hover:bg-white/20"
+          className="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs text-white/85 transition-all duration-200 hover:-translate-y-0.5 hover:border-white/40 hover:bg-white/20 active:translate-y-0 active:scale-[0.98]"
         >
           {item}
         </button>
