@@ -1,103 +1,143 @@
 # PersonaTalk AI
 
-A standout persona-based AI chatbot for Assignment 01 (Prompt Engineering, Scaler Academy), featuring:
-- Three deeply separated personas (Anshuman, Abhimanyu, Kshitij)
-- Real Gemini streaming responses
-- Conversation reset on persona switch
-- Suggestion chips, typing indicator, and graceful error states
-- Distinctive glassmorphism + aurora-gradient interface
+**PersonaTalk AI** is a persona-based chat app: pick a mentor-style profile and chat in real time with **streaming** responses powered by **Google Gemini**. Each persona has its own system prompt—voice, few-shot examples, step-by-step reasoning, output shape, and guardrails. The UI includes a persona switcher, per-persona suggestion chips, a typing indicator, resilient API errors, and a responsive layout.
 
-## Tech Stack
+---
 
-- Next.js (App Router) + TypeScript
-- Tailwind CSS v4
-- Google Gemini (`@google/genai`)
+## Live app
 
-## Local Setup
+**https://persona-talk-ai.vercel.app/**
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Create env file:
-   ```bash
-   cp .env.example .env.local
-   ```
-3. Add your key in `.env.local`:
-   ```env
-   GEMINI_API_KEY=your_key_here
-   GEMINI_MODEL=gemini-2.5-flash
-   ```
-4. Start development server:
-   ```bash
-   npm run dev
-   ```
-5. Open `http://localhost:3000`.
+---
 
-## Assignment Criteria Coverage
+## Screenshots
 
-- Persona switcher for all 3 personalities
-- Thread reset on persona change
-- Active persona always visible
-- Persona-specific suggestion chips
-- Typing indicator during API generation
-- Mobile responsive layout
-- API key only via env var
-- Distinct system prompts with few-shot examples, CoT instruction, output instruction, constraints
-- Graceful backend/API error handling
+**Landing — Anshuman Singh, hero + pull quote + numbered "known for" + suggestion chips**
 
-## Project Structure
+![Landing — Anshuman Singh](./public/screenshots/landing.png)
+
+**Active conversation — real Gemini streaming response in-character**
+
+![Active conversation with Anshuman](./public/screenshots/conversation.png)
+
+**Mobile (iPhone 14 Pro Max) — sidebar hides, pill-row persona switcher, stacked knownFor, composer pinned**
+
+![Mobile view — Abhimanyu Saxena](./public/screenshots/mobile.png)
+
+Images live under [`public/screenshots/`](./public/screenshots/). Commit and push them so GitHub’s README preview can load them.
+
+---
+
+## Features
+
+| Area | What you get |
+|------|----------------|
+| **Three personas** | Anshuman Singh, Abhimanyu Saxena, Kshitij Mishra — separate prompts in [`lib/personas.ts`](./lib/personas.ts) |
+| **Persona switcher** | Switching profile clears the thread and applies the new system prompt |
+| **Active persona** | Always visible in the header (name, role, quote, avatar) |
+| **Suggestion chips** | Per-persona starters |
+| **Typing indicator** | While the model is generating |
+| **Streaming** | Token stream from [`app/api/chat/route.ts`](./app/api/chat/route.ts) |
+| **Responsive** | Works on mobile and desktop |
+| **Secrets** | `GEMINI_API_KEY` only via environment variables |
+| **Errors** | Friendly messages for auth, quota, and server issues |
+
+---
+
+## Tech stack
+
+- **Next.js** (App Router) + **TypeScript**
+- **Tailwind CSS**
+- **Google Gemini** (`@google/genai`), streaming
+
+---
+
+## Local setup
+
+```bash
+git clone <your-repo-url>
+cd PersonaTalk_Al
+npm install
+cp .env.example .env.local
+```
+
+Edit **`.env.local`** (do not commit):
+
+```env
+GEMINI_API_KEY=your_real_key_here
+GEMINI_MODEL=gemini-2.5-flash
+```
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+---
+
+## Environment variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `GEMINI_API_KEY` | Yes | Gemini API key — `.env.local` locally; host dashboard in production |
+| `GEMINI_MODEL` | No | Model id; see [`.env.example`](./.env.example) |
+
+Only [`.env.example`](./.env.example) belongs in git (placeholders). Never commit `.env.local` or real keys.
+
+---
+
+## Deploy (Vercel)
+
+1. Push the repo to GitHub.  
+2. Import the project in [Vercel](https://vercel.com/).  
+3. Set **Environment Variables** for Production: `GEMINI_API_KEY` (and optionally `GEMINI_MODEL`).  
+4. Deploy and smoke-test: all three personas, switch + reset, chips, streaming, errors.
+
+---
+
+## Repo docs
+
+| File | Contents |
+|------|-----------|
+| [`prompts.md`](./prompts.md) | All three system prompts, annotated |
+| [`reflection.md`](./reflection.md) | Build notes and lessons learned |
+
+---
+
+## Project structure
 
 ```text
-persona-chat/
 ├── app/
-│   ├── api/chat/route.ts         # Streaming Gemini route
-│   ├── globals.css
+│   ├── api/chat/route.ts    # Streaming Gemini
 │   ├── layout.tsx
-│   └── page.tsx                  # Main page shell
-├── components/
-│   ├── ChatClient.tsx            # Main chat orchestration
-│   ├── MessageBubble.tsx
-│   ├── PersonaSwitcher.tsx
-│   ├── SuggestionChips.tsx
-│   └── TypingIndicator.tsx
+│   ├── page.tsx
+│   └── globals.css
+├── components/               # Chat, switcher, chips, typing indicator
+├── public/screenshots/       # README images
 ├── lib/
-│   ├── personas.ts               # Persona metadata + system prompts
+│   ├── personas.ts           # Persona metadata + system prompts
 │   ├── types.ts
 │   └── utils.ts
 ├── prompts.md
 ├── reflection.md
-└── .env.example
+├── .env.example
+└── README.md
 ```
 
-## Deploy (Vercel)
+---
 
-1. Push to GitHub.
-2. Import repo in Vercel.
-3. Add env var `GEMINI_API_KEY` (and optional `GEMINI_MODEL`).
-4. Deploy and copy your public live URL.
-5. Test persona switch + streaming in production.
+## Production troubleshooting
 
-## Environment Variables
+| Issue | What to check |
+|-------|----------------|
+| Missing `GEMINI_API_KEY` | Vercel env → redeploy |
+| Invalid key | New key in Google AI Studio → update env → redeploy |
+| Quota / rate limits | Wait or new key; UI should still show a clear message |
+| Empty / stuck replies | Vercel function logs, model name, API access |
 
-Use real secrets only in local or hosting environment settings:
+---
 
-```env
-GEMINI_API_KEY=your_real_key
-GEMINI_MODEL=gemini-2.5-flash
-```
+## Ethics note
 
-- Keep real secrets in `.env.local` (never commit).
-- Commit only `.env.example` with placeholder values.
-
-## Production Troubleshooting
-
-- `Server is missing GEMINI_API_KEY` -> add env variable in Vercel and redeploy.
-- `Gemini API key is invalid or not authorized` -> rotate key, update Vercel env, redeploy.
-- `Gemini quota exceeded` -> wait/reset quota or use another valid key.
-- No AI response in deployed app -> confirm env vars are set for Production and inspect Vercel Function logs.
-
-## Notes
-
-- The personas are real public figures and are represented respectfully.
-- Responses are AI-generated simulations, not real statements.
+Featured individuals are real public figures. Prompts aim for **respectful, professional** tone. Replies are **AI-generated**, not their actual statements.
